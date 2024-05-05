@@ -3,7 +3,7 @@ from recorte import *
 
 imagesFolderPath = "./Images/"
 similarImagesFolderPath = "./SimilarImages/"
-referenceImage = "3153002630_6_1_1.png"
+referenceImage = "0039678800_3_1_1.png"
 
 compareSetNumber = 5 
 compareMinSimilarity = 10
@@ -15,13 +15,16 @@ def compare_images(imagen_reference_cv2):
 
     bestImages = []
 
+    plantilla = eliminar_contorno(imagen_reference_cv2)
+
+
     for image in imagesInFolder:
         if (image.endswith(".png")):
             imagen_cv2 = cv2.imread(imagesFolderPath + image, 1)
 
             maskImgCompare = crearMascara(imagen_cv2)
 
-            if compareReferenceWithImage(imagen_reference_cv2, imagen_cv2, maskImgRef, maskImgCompare) > 0.1:
+            if compareReferenceWithImage(imagen_reference_cv2, imagen_cv2, maskImgRef, maskImgCompare, plantilla, imagesFolderPath, image) > 0.1:
                 imagen_cv2 = cv2.resize(imagen_cv2, (1024,1024))
                 bestImages.append(imagen_cv2)
     
@@ -33,15 +36,15 @@ def main():
     imagen_reference_cv2 = cv2.imread(imagesFolderPath + referenceImage, 1)
 
 
-    compare_images(imagen_reference_cv2)
+    bestImages = compare_images(imagen_reference_cv2)
     
     
-    # i = 0
-    # bestImagesCount = len(bestImages)
-    # for image in bestImages:
-    #     i += 1
-    #     cv2.imshow(str(i) + " de " + str(bestImagesCount) + "bestImages", image)
-    #     cv2.waitKey(0)
+    i = 0
+    bestImagesCount = len(bestImages)
+    for image in bestImages:
+        i += 1
+        cv2.imshow(str(i) + " de " + str(bestImagesCount) + "bestImages", image)
+        cv2.waitKey(0)
 
 if __name__ == "__main__":
     main()

@@ -14,6 +14,9 @@ import matplotlib.image as image
 
 import skimage as ski
 
+from skimage.metrics import structural_similarity as ssim
+
+
 def saveImage(imagen, ruta_guardado):
     try:
         imagen.save(ruta_guardado)
@@ -102,15 +105,46 @@ def plotImage(imageRoute):
     plt.axis('off')  # Desactivar los ejes
     plt.show()
 
-def compareReferenceWithImage(imageReference, imageToCompareWith, maskImgRef, maskImgCompare):
+def compareReferenceWithImage(imageReference, imageToCompareWith, maskImgRef, maskImgCompare, plantilla, carpeta_imagenes, nombre_imagen):
     #saveImage(imagen_pillow, similarImagesFolderPath + image)
     #recortar_contornos(imagen_cv2)
-    diferencia = compararHistogramas(imageReference, imageToCompareWith, maskImgRef, maskImgCompare)
-    if (diferencia > 0.1):
-        print("Diferencia: ", diferencia)
-        return diferencia
+    diferenciaForma = compararForma(plantilla, carpeta_imagenes, nombre_imagen)
+    diferenciaHistograma = compararHistogramas(imageReference, imageToCompareWith, maskImgRef, maskImgCompare)
+    if (diferenciaHistograma > 0.1 and diferenciaForma > 0.8):
+        print("DiferenciaHistograma: ", diferenciaForma)
+
+        return diferenciaForma
     return 0
+
+def compararForma(plantilla, carpeta_imagenes, nombre_imagen):
+    imagen_a_guardar = cv2.imread(os.path.join(carpeta_imagenes, nombre_imagen))
+    imagen_a_comprobar = eliminar_contorno(imagen_a_guardar)
+    # Asegurarse de que las imágenes tienen el mismo tamaño
+
+    if imagen_a_comprobar is not None:
+        diferenciaForma = ssim(plantilla,imagen_a_comprobar)
+        if (diferenciaForma>umbral):
+            return diferenciaForma
+        return 0
+            #lista_coincidencias.append((imagen_a_guardar,sim))
     
+def eliminar_contorno(imagen):
+    imagen = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
+    imagen = cv2.resize(imagen, (1024,1024))
+    _, imagen_umbralizada = cv2.threshold(imagen, 254, 255, cv2.THRESH_BINARY)
+    invertida = 255 - imagen_umbralizada
+    contornos, _ = cv2.findContours(invertida, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    imagen_contornos = np.zeros_like(invertida)
+    cv2.drawContours(imagen_contornos, contornos, -1, 255, thickness=cv2.FILLED)
+    #resultado = cv2.bitwise_and(imagen, imagen, mask=imagen_contornos)
+    # cv2.imshow('Imagen', imagen_contornos)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+    return imagen_contornos
+
+#definimos umbral
+umbral = 0.8
+
 def deleteBackground(inImage):
     imageHSV = ski.color.rgb2hsv(inImage)
     
