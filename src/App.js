@@ -7,6 +7,7 @@ import imagenMujer from './imagenes_mujer/mujer1.jpg';
 
 function App() {
   const [previewUrl, setPreviewUrl] = useState('');
+  const [similarImages, setSimilarImages] = useState([]);
   const fileInputRefSingle = useRef(null);
 
   const handleFileChange = (event) => {
@@ -27,10 +28,27 @@ function App() {
           'Content-Type': 'multipart/form-data'
         }
       });
-      console.log(response.data);
+      setSimilarImages(response.data.similar_images);  // Asumiendo que la respuesta incluye un array de URLs de imágenes
     } catch (error) {
       console.error('Error al enviar la imagen al servidor:', error);
     }
+  };
+
+  const openInNewWindow = () => {
+    const newWindow = window.open('', '_blank');
+    const html = `
+      <html>
+        <head>
+          <title>Imágenes Similares</title>
+        </head>
+        <body>
+          ${similarImages.map(src => <img src="${src}" style="margin: 10px; width: 300px;"/>).join('')}
+        </body>
+      </html>
+    `;
+    newWindow.document.open();
+    newWindow.document.write(html);
+    newWindow.document.close();
   };
 
   return (
@@ -52,7 +70,7 @@ function App() {
             <input type="file" ref={fileInputRefSingle} onChange={handleFileChange} style={{ display: 'none' }} />
             {previewUrl && <img src={previewUrl} alt="Vista previa" />}
           </div>
-          <button className="button-similar" onClick={() => sendImageToBackend}>Get similar images</button>
+          <button className="button-similar" onClick={openInNewWindow}>Get similar images</button>
         </div>
         <div className="column">
           <img src={imagenMujer} alt="Mujer" style={{ maxWidth: '100%', maxHeight: '100%' }} />
