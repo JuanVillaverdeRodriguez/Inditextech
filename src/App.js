@@ -7,7 +7,7 @@ import imagenMujer from './imagenes_mujer/mujer1.jpg';
 
 function App() {
   const [previewUrl, setPreviewUrl] = useState('');
-  const [similarImages, setSimilarImages] = useState([]);
+  const [similarImages, setSimilarImages] = useState([]);  // Ahora almacenará imágenes en base64
   const fileInputRefSingle = useRef(null);
 
   const handleFileChange = (event) => {
@@ -28,7 +28,7 @@ function App() {
           'Content-Type': 'multipart/form-data'
         }
       });
-      setSimilarImages(response.data.similar_images);  // Asumiendo que la respuesta incluye un array de URLs de imágenes
+      setSimilarImages(response.data.similar_images);  
     } catch (error) {
       console.error('Error al enviar la imagen al servidor:', error);
     }
@@ -42,7 +42,7 @@ function App() {
           <title>Imágenes Similares</title>
         </head>
         <body>
-          ${similarImages.map(src => <img src="${src}" style="margin: 10px; width: 300px;"/>).join('')}
+          ${similarImages.map(img => <img src="data:image/jpeg;base64,${img[1]}" style="margin: 10px; width: 300px;"/>).join('')}
         </body>
       </html>
     `;
