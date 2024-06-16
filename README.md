@@ -13,7 +13,7 @@ This is our submission for the HackUPC 2024, it's an  application designed to he
 - **Python**: Programming language.
 - **OpenCV**: Computer vision library for image processing.
 - **MatPlotlib**: Plotting of images.
-- 
+
 ## Contributors
 - **Juan Villaverde Rodriguez**: [GitHub](https://github.com/JuanVillaverdeRodriguez)
 - **Pablo Fernandez**: [GitHub](https://github.com/pabloofdz)
